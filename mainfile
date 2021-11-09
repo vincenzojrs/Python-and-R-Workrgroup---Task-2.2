@@ -1,0 +1,99 @@
+  #installing and importing libraries needed
+install.packages("cowplot")
+install.packages("magick")
+
+library (tidyverse)
+library(jsonlite)
+library(ggplot2)
+library(cowplot)
+library(magick)
+
+  #json importing and a bit of data cleaning
+cards <- fromJSON("https://raw.githubusercontent.com/vincenzojrs/Python-and-R-Workrgroup---Task-2.2/main/cards.json")
+df <- as.data.frame(cards)
+df <- df[c(1,3,4,7,8,9,11,13,15,16,29)]
+
+  #logo importing
+image_to_add <- "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Magicthegathering-logo.svg/1280px-Magicthegathering-logo.svg.png"image_to_add <- "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Magicthegathering-logo.svg/1280px-Magicthegathering-logo.svg.png"
+  
+  #creating two more columns with with custom ratios
+df$cards.average <- as.numeric(df$cards.power) + as.numeric(df$cards.toughness)
+df$cards.ratio <-  as.numeric(df$cards.average) / df$cards.cmc
+
+  #setting the theme
+theme_set(theme_cowplot())
+
+  #cleaning the dataframe from empty values
+df_clean = filter(df, !(cards.power== c("NA","*")))
+
+  #plots creating thanks to ggplot
+  
+  #geom_count increase or decrease the size of the points 
+  #according to the number of observations with the same x and y values
+  
+  #ggdraw is used to add the logo for an aesthethical purpose
+  
+ggp1 <- ggplot(data = df_clean) +
+  geom_count(mapping = aes(x = cards.average , y = cards.cmc )) 
+  facet_wrap(~ cards.rarity, nrow = 3) 
+ggdraw()+
+  draw_image(image_to_add, x = 0.4, y = -0.47, scale = 0.14)+
+  draw_plot(ggp1)
+  
+ggp2 <- ggplot(data = df_clean) +
+  geom_count(mapping = aes(x = cards.power , y = cards.cmc, color = cards.rarity))
+ggdraw()+
+  draw_image(image_to_add, x = 0.4, y = -0.47, scale = 0.14)+
+  draw_plot(ggp2)
+
+  #geom_smooth creates a line
+
+ggp3 <- ggplot(data = df_clean) +
+  geom_smooth(mapping = aes(x = cards.cmc, y = cards.average))
+  
+  ggp3 <- ggplot(data = df_clean) +
+  geom_smooth(mapping = aes(x = cards.cmc, y = cards.average))+
+  theme_minimal_grid(12)
+
+ggp4 <- ggplot(data = df_clean) +
+  geom_smooth(
+    mapping = aes(x = cards.cmc, y = cards.average, color = cards.rarity),
+    show.legend = FALSE
+  )
+ggdraw()+
+  draw_image(image_to_add, x = 0.4, y = -0.47, scale = 0.14)+
+  draw_plot(ggp4)
+
+ggp5 <- ggplot(data = df_clean) +
+  geom_point(mapping = aes(x = cards.cmc, y = cards.average)) +
+  geom_smooth(mapping = aes(x = cards.cmc, y = cards.average))
+draw_image(image_to_add, x = 0.4, y = -0.47, scale = 0.14)+
+  draw_plot(ggp5)
+
+ggp6 <- ggplot(data = df_clean, mapping = aes(x = cards.cmc, y = cards.average)) +
+  geom_point(mapping = aes(color = cards.rarity)) +
+  geom_smooth()
+ggdraw()+
+  draw_image(image_to_add, x = 0.4, y = -0.47, scale = 0.14)+
+  draw_plot(ggp6)
+
+  #geom_bar creates a bar graph
+
+ggp7 <- ggplot(df, aes(x = "", fill = factor(cards.rarity))) + 
+  geom_bar(width = 1) +
+  theme(axis.line = element_blank(), 
+        plot.title = element_text(hjust=0.5)) + 
+  labs(fill="class", 
+       x=NULL, 
+       y=NULL, 
+       title="Bar Chart of cards rarity", 
+       caption="Source: DF MTG")
+ggdraw()+
+  draw_image(image_to_add, x = 0.4, y = -0.47, scale = 0.14)+
+  draw_plot(ggp7)
+
+ggp8 <- ggplot(data = df) + 
+  geom_bar(mapping = aes(x = cards.cmc), fill = "#FF6666" )
+ggdraw()+
+  draw_image(image_to_add, x = 0.4, y = -0.47, scale = 0.14)+
+  draw_plot(ggp8)
