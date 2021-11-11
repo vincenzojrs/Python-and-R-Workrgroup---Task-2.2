@@ -1,59 +1,64 @@
-  #installing and importing libraries needed
+  #install, and recall all the packages and libraries we need
 install.packages("cowplot")
 install.packages("magick")
-
+install.packages("ggpubr")
 library (tidyverse)
 library(jsonlite)
-library(ggplot2)
 library(cowplot)
+library(ggplot2)
 library(magick)
+library(ggpubr)
 
-  #json importing and a bit of data cleaning
+  #We import the JSON dataframe that we uploaded to our GIT repository 
 cards <- fromJSON("https://raw.githubusercontent.com/vincenzojrs/Python-and-R-Workrgroup---Task-2.2/main/cards.json")
+
+  #we assign the name "df" to our dataframe and select the columns that interest us
 df <- as.data.frame(cards)
 df <- df[c(1,3,4,7,8,9,11,13,15,16,29)]
 
-  #logo importing
-image_to_add <- "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Magicthegathering-logo.svg/1280px-Magicthegathering-logo.svg.png"image_to_add <- "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Magicthegathering-logo.svg/1280px-Magicthegathering-logo.svg.png"
-  
-  #creating two more columns with with custom ratios
-df$cards.average <- as.numeric(df$cards.power) + as.numeric(df$cards.toughness)
-df$cards.ratio <-  as.numeric(df$cards.average) / df$cards.cmc
+  #attach function allows us not to repeat the dataframe name in every step
+attach(df)
 
-  #setting the theme
+  #create two new columns representing the variable average and ratio of each card 
+df$cards.average <- as.numeric(df$cards.power) + as.numeric(df$cards.toughness) #potenza e resistenza sommate
+df$cards.ratio <-  as.numeric(df$cards.average) / df$cards.cmc #rapporto tra potenza complessiva e costo di evocazione 
+
+  #we eliminate null values from columns
+df = filter(df, !(cards.power== c("NA","*","*")))
+
+  #We create a new dataframe by selecting only the columns that contain the quantitative variables. Thanks to the use of the pipe operator the code is better readable.
+df_clean <- df %>% 
+  select(cards.name , cards.cmc , cards.rarity , cards.power:cards.ratio)%>%
+  arrange(desc(cards.ratio))
+
+  #We display only legendary cards thanks to the "filter" function
+Legendary.cards= filter(df, cards.supertypes == "Legendary")
+Legendary.cards
+
+  #we import thanks to an URL the .png logo of Magic to insert it in the graphs
+image_to_add <- "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Magicthegathering-logo.svg/1280px-Magicthegathering-logo.svg.png"
 theme_set(theme_cowplot())
 
-  #cleaning the dataframe from empty values
-df_clean = filter(df, !(cards.power== c("NA","*")))
 
-  #plots creating thanks to ggplot
-  
-  #geom_count increase or decrease the size of the points 
-  #according to the number of observations with the same x and y values
-  
-  #ggdraw is used to add the logo for an aesthethical purpose
-  
+  #We create various graphs using the "ggplot" function to build them.
+  #The "ggdraw" function allows us to insert an image and place it in the graph where we prefer
 ggp1 <- ggplot(data = df_clean) +
   geom_count(mapping = aes(x = cards.average , y = cards.cmc )) 
-  facet_wrap(~ cards.rarity, nrow = 3) 
+facet_wrap(~ cards.rarity, nrow = 3) 
 ggdraw()+
   draw_image(image_to_add, x = 0.4, y = -0.47, scale = 0.14)+
   draw_plot(ggp1)
-  
+
 ggp2 <- ggplot(data = df_clean) +
   geom_count(mapping = aes(x = cards.power , y = cards.cmc, color = cards.rarity))
 ggdraw()+
   draw_image(image_to_add, x = 0.4, y = -0.47, scale = 0.14)+
   draw_plot(ggp2)
 
-  #geom_smooth creates a line
-
 ggp3 <- ggplot(data = df_clean) +
-  geom_smooth(mapping = aes(x = cards.cmc, y = cards.average))
-  
-  ggp3 <- ggplot(data = df_clean) +
   geom_smooth(mapping = aes(x = cards.cmc, y = cards.average))+
   theme_minimal_grid(12)
+ggp3
 
 ggp4 <- ggplot(data = df_clean) +
   geom_smooth(
@@ -63,6 +68,7 @@ ggp4 <- ggplot(data = df_clean) +
 ggdraw()+
   draw_image(image_to_add, x = 0.4, y = -0.47, scale = 0.14)+
   draw_plot(ggp4)
+ggp4
 
 ggp5 <- ggplot(data = df_clean) +
   geom_point(mapping = aes(x = cards.cmc, y = cards.average)) +
@@ -70,14 +76,13 @@ ggp5 <- ggplot(data = df_clean) +
 draw_image(image_to_add, x = 0.4, y = -0.47, scale = 0.14)+
   draw_plot(ggp5)
 
+
 ggp6 <- ggplot(data = df_clean, mapping = aes(x = cards.cmc, y = cards.average)) +
   geom_point(mapping = aes(color = cards.rarity)) +
   geom_smooth()
 ggdraw()+
   draw_image(image_to_add, x = 0.4, y = -0.47, scale = 0.14)+
   draw_plot(ggp6)
-
-  #geom_bar creates a bar graph
 
 ggp7 <- ggplot(df, aes(x = "", fill = factor(cards.rarity))) + 
   geom_bar(width = 1) +
@@ -97,3 +102,10 @@ ggp8 <- ggplot(data = df) +
 ggdraw()+
   draw_image(image_to_add, x = 0.4, y = -0.47, scale = 0.14)+
   draw_plot(ggp8)
+
+  #the function "ggarrange" arrange multiple ggplot objects on a page, aligning the plot panels.
+ggarrange(ggp1,ggp2, nrow = 2,ncol = 1)
+ggarrange(ggp3, ggp4, nrow = 2,ncol = 1)
+ggarrange(ggp5,ggp6,ggp7,ggp8,nrow=2, ncol= 2)
+
+
