@@ -9,7 +9,7 @@ library(ggplot2)
 library(magick)
 library(ggpubr)
 
-  #We import the JSON dataframe that we uploaded to our GIT repository 
+  #We import the JSON dataframe from a GIT repository 
 cards <- fromJSON("https://raw.githubusercontent.com/simonelugithub/API-project-/7eb17de80689dcbc6251c354d87aad6bb51ec6b0/MGT.csv")
 
   #we assign the name "df" to our dataframe and select the columns that interest us
