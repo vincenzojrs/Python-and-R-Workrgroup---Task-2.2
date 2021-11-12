@@ -10,7 +10,7 @@ library(magick)
 library(ggpubr)
 
   #We import the JSON dataframe that we uploaded to our GIT repository 
-cards <- fromJSON("https://raw.githubusercontent.com/vincenzojrs/Python-and-R-Workrgroup---Task-2.2/main/cards.json")
+cards <- fromJSON("https://raw.githubusercontent.com/simonelugithub/API-project-/7eb17de80689dcbc6251c354d87aad6bb51ec6b0/MGT.csv")
 
   #we assign the name "df" to our dataframe and select the columns that interest us
 df <- as.data.frame(cards)
