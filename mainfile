@@ -39,7 +39,7 @@ image_to_add <- "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Magic
 theme_set(theme_cowplot())
 
   #we create various graphs using the "ggplot" function to build them.
-#The "ggdraw" function allows us to insert an image and place it in the graph where we prefer
+  #the "ggdraw" function allows us to insert an image and place it in the graph where we prefer
 ggp1 <- ggplot(data = df_clean) +
   geom_count(mapping = aes(x = cards.average , y = cards.cmc )) 
 facet_wrap(~ cards.rarity, nrow = 3) 
@@ -101,7 +101,7 @@ ggdraw()+
   draw_image(image_to_add, x = 0.4, y = -0.47, scale = 0.14)+
   draw_plot(ggp7)
 
-#the function "ggarrange" arrange multiple ggplot objects on a page, aligning the plot panels.
+  #the function "ggarrange" arrange multiple ggplot objects on a page, aligning the plot panels.
 ggarrange(ggp1,ggp2, nrow = 2,ncol = 1)
 ggarrange(ggp3, ggp4, nrow = 2,ncol = 1)
 ggarrange(ggp5,ggp6,ggp7,ggp8,nrow=2, ncol= 2)
