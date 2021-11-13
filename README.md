@@ -9,4 +9,4 @@ Magic: The Gathering, also Magic or MTG, is a strategy card game created by Rich
 The documentation related to the APIs are provided at the following link: https://api.magicthegathering.io/v1/cards
 
 # Code Explanation:
-The complete explanation of the code is available here: [Documentation]()
+The complete explanation of the code is available here: [Documentation](https://github.com/vincenzojrs/Python-and-R-Workrgroup---Task-2.2/blob/main/Documentation%20Magic%20Project%20Task%202.2.pdf)
