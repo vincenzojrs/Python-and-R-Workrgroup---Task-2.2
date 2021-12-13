@@ -1,0 +1,57 @@
+---
+title: "R Markdown for Py&R Project - Task 2.2"
+author: "Matteo Gioia and Vincenzo Junior Striano"
+date: "December 13, 2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+We load all the packages that we need with the command library().
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+library(ggplot2)
+library(magick)
+library(ggpubr)
+library(jsonlite)
+```
+We import the json dataframe from Simone Lu’s GitHub repository thanks to the function fromJSON used to convert JSON data in R objects. We noticed that Simone and his team kept editing the source file, so we forked the “raw” version into our GitHub.
+```{r message=FALSE, warning=FALSE}
+df <- fromJSON("https://raw.githubusercontent.com/vincenzojrs/Python-and-R-Workrgroup---Task-2.2/main/cards.json")
+```
+We extract the dataframe from the json and filter the column of our interest.
+```{r message=FALSE, warning=FALSE}
+df <- as.data.frame(df$cards)
+df <- df[,c(1,3,4,7,8,9,11,13,15,16,29)]
+```
+At this point we decide to create two new columns of variables. The new two columns contain: 
+•	the average of each card representing the sum of power and toughness
+•	the ratio calculated as the ratio between the average and the mana cost of evocation of each card.
+```{r message=FALSE, warning=FALSE}
+df$average <- as.numeric(df$power) + as.numeric(df$toughness) 
+df$ratio <-  as.numeric(df$average) / df$cmc 
+```
+We note that some columns contain null values named by the initials NA or special characters. We decide to omit those lines from our dataframe as they would complicate the graphic transposition. All this is possible thanks to the filter() function of the dplyr package. Its documentation available here: https://dplyr.tidyverse.org/reference/filter.html
+```{r message=FALSE, warning=FALSE}
+df = filter(df, !(power == c("NA","*","*")))
+```
+We create a new dataframe by selecting only the columns that contain the quantitative variables. Thanks to the use of the pipe operator the code is better readable. The pipe operator, written as %>%, has been a longstanding feature of the magrittr package for R. Magrittr documentation available here: https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html. It takes the output of one function and passes it into another function as an argument. This allows us to link a sequence of analysis steps.
+```{r message=FALSE, warning=FALSE}
+df_clean <- df %>% 
+  select(name , cmc , rarity , power:ratio)%>%
+  arrange(desc(ratio))
+```
+Out of curiosity we want to see how many legendary cards are present in this dataframe:
+```{r message=FALSE, warning=FALSE}
+legendary_c <- filter(df, supertypes == "Legendary")
+```
+Before starting to create charts, we import an image from the web, it will be useful later:
+```{r message=FALSE, warning=FALSE}
+image_to_add <- "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Magicthegathering-logo.svg/1280px-Magicthegathering-logo.svg.png"
+```
+It’s time to create graphs with a specific function. Ggplot2 is one of the packages of tidyverse. Tidyverse is a set of packages needed for data science. You provide the data, tell ggplot2 how to map variables to aesthetics, what graphical primitives to use, and it takes care of the details. It’s hard to succinctly describe how ggplot2 works because it embodies a deep philosophy of visualisation. However, in most cases you start with ggplot(), supply a dataset and aesthetic mapping (with aes()). You then add on layers (like geom_point() or geom_histogram()), scales (like scale_colour_brewer()), faceting specifications (like facet_wrap()) and coordinate systems (like coord_flip()). Ggplot guidelines available here:	 https://ggplot2.tidyverse.org
+Themes are a powerful way to customize the non-data components of your plots. Themes can be used to give plots a consistent customized look. Modify a single plot's theme using theme(). The cowplot package is a simple add-on to ggplot. It provides various features that help with creating publication-quality figures, such as a set of themes, functions to align plots and arrange them into complex compound figures, and functions that make it easy to annotate plots and or mix plots with images. Documentation here: https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html
+
+Unfortunately, we noticed that ggplot2 shows some error when knitting: other online users had the same problems.
