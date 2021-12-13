@@ -29,10 +29,13 @@ legendary_c <- filter(df, supertypes == "Legendary")
 
   #we import the logo of Magic to place it in the graphs
 image_to_add <- "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Magicthegathering-logo.svg/1280px-Magicthegathering-logo.svg.png"
+
+  #let's set the theme
 theme_set(theme_cowplot())
 
   #we create various graphs using the "ggplot" function to build them
   #the "ggdraw" function allows us to insert an image and place it in the graph where we prefer
+  #we also "attached" the df_clean dataframe not to repeat that everytime
 attach(df_clean)
 ggp1 <- ggplot() +
   geom_count(mapping = aes(x = average , y = cmc )) 
